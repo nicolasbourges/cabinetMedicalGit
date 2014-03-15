@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<listePatientsType>
+    <patient>
+        <idPersonne>1</idPersonne>
+        <nom>DUPONT</nom>
+        <prenom>Julie</prenom>
+        <dateNaissance>1960-05-21+01:00</dateNaissance>
+        <sexe>Feminin</sexe>
+        <telephone>0555434355</telephone>
+        <portable>0606060606</portable>
+        <email>julie.dupont@tralala.fr</email>
+        <adresse>
+            <numero>15</numero>
+            <rue>avenue Jean Jaurès</rue>
+            <voie/><voie/>
+			<batiment/><batiment/>
+            <codePostal>87000</codePostal>
+            <ville>Limoges</ville>
+            <pays>France</pays>
+        </adresse>
+        <nir>260058700112367</nir>
+    </patient>
+    <patient>
+        <idPersonne>2</idPersonne>
+        <nom>DURAND</nom>
+        <prenom>Toto</prenom>
+        <dateNaissance>1990-12-25+01:00</dateNaissance>
+        <sexe>Masculin</sexe>
+        <telephone>0555430000</telephone>
+        <portable>0605040302</portable>
+        <email>toto.durand@etu.unilim.fr</email>
+        <adresse>
+            <numero>185</numero>
+            <rue>avenue Albert Thomas</rue>
+            <voie/><voie/>
+            <batiment>Résidence La Borie - Batiment A</batiment>
+            <codePostal>87085</codePostal>
+            <ville>Limoges</ville>
+            <pays>France</pays>
+        </adresse>
+        <nir>297112A10102401</nir>
+    </patient>
+</listePatientsType>
