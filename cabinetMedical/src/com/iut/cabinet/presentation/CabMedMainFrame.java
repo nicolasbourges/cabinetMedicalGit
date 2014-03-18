@@ -43,7 +43,7 @@ public class CabMedMainFrame extends JFrame{
 		
 		JMenuBar menu = new JMenuBar();
 		
-		JMenu menuFichier = new JMenu("Options");
+		JMenu menuFichier = new JMenu("Fichier");
 		JMenuItem menuQuitter = new JMenuItem("Quitter");
 		menuQuitter.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent e) {
