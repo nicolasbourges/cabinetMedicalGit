@@ -133,6 +133,7 @@ public class GererPatientCtrl {
 		}
 		Connection conn = null;
 		conn = SimpleConnection.getInstance().getconnection();
+		conn.setAutoCommit(false);
 		Collection <Personne> maListe = PersonneDAOJDBC.findAllPersonnes(conn);
 		for (Personne unPatientDTO: maListe){
 			if(unPatientDTO instanceof Patient && unPatientDTO.getNom().equals(nom) && unPatientDTO.getPrenom().equals(prenom) &&((Patient) unPatientDTO).getNir().equals(nir)){
@@ -166,18 +167,26 @@ public class GererPatientCtrl {
 		}
 		Connection conn = null;
 		conn = SimpleConnection.getInstance().getconnection();
-		Collection <Personne> maListe = PersonneDAOJDBC.findAllPersonnes(conn);
-		Personne patientASupprimer;
-		patientASupprimer=trouverPatient(nom, prenom, nir);
-		if(patientASupprimer==null){
-			System.out.println("Le patient indiqué n'est pas dans la liste");
+		Patient unPat = new Patient(nom, prenom, nir);
+		
+		//ajout d'une Personne dans la BD
+		PersonneDAOJDBC.deletePersonne(unPat, conn);
+		try{
+			conn.setAutoCommit(false);	//sinon le commit de l'ennoncé du TP ne servirait à rien
+			conn.commit();
+		} catch(SQLException e){
+			e.printStackTrace();
+			throw new CabinetTechniqueException("Problème lors de la validation de la trasnsaction"+e.getMessage());
 		}
-		else{
-			maListe.remove(patientASupprimer);
-			PersonneDAOFichier.storeAllPersonnes(maListe);
+		
+		try{
+			if(conn!=null && !conn.isClosed()){
+				conn.close();
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+			throw new CabinetTechniqueException("Problème lors de la fermeture de la connexion"+e.getMessage());
 		}
-		conn.commit();	//penser au rolllback au cas où
-		conn.close();
 		if(logger.isDebugEnabled()){
 			logger.debug("Sortie de la méthode supprimerPatient de GererPatientCtrl");
 		}

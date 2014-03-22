@@ -42,6 +42,16 @@ public abstract class Personne implements Serializable {
 	}
 	
 	/**
+	 * @param nom
+	 * @param prenom
+	 */
+	public Personne(String nom, String prenom) {
+		super();
+		this.nom = nom;
+		this.prenom = prenom;
+	}
+
+	/**
 	 * Retourne l'identifiant de la Personne
 	 * @return l'idPersonne
 	 */

@@ -163,6 +163,61 @@ public class PersonneDAOJDBC {
 		}
 	}
 	
+	/**
+	 * Méthode permettant de supprimer une Personne de la base de données mySQL
+	 * @param unePers la personne à supprimer
+	 * @param c la connexion à la BD
+	 * @throws CabinetTechniqueException
+	 * @throws SQLException
+	 */
+	public static void deletePersonne(Personne unePers, Connection c) throws CabinetTechniqueException, SQLException{
+		if(logger.isDebugEnabled()){
+			logger.debug("Entrée dans la méthode deletePersonne de PersonneDAOJDBC");
+		}
+		//Pour l'adresse
+		PreparedStatement pst = null;
+		String requete = "delete from adresse where idPersonne = (select idPersonne from personne where nom = ? && prenom = ? && nir=?)";
+		
+		try{
+			pst = c.prepareStatement(requete);
+			pst.setString(1, unePers.getNom());
+			pst.setString(2, unePers.getPrenom());
+			Patient unPat = (Patient)unePers;
+			pst.setString(3, unPat.getNir());
+			
+			@SuppressWarnings("unused")
+			int nbLignes = pst.executeUpdate();
+			
+			c.setAutoCommit(false);
+			c.commit();
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		//Pour la personne
+		requete = "delete from Personne where nom = ? && prenom = ? && nir=?";
+		
+		try{
+			pst = c.prepareStatement(requete);
+			pst.setString(1, unePers.getNom());
+			pst.setString(2, unePers.getPrenom());
+			Patient unPat = (Patient)unePers;
+			pst.setString(3, unPat.getNir());
+			
+			@SuppressWarnings("unused")
+			int nbLignes = pst.executeUpdate();
+			
+			c.setAutoCommit(false);
+			c.commit();
+			
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		if(logger.isDebugEnabled()){
+			logger.debug("Sortie de la méthode deletePersonne de PersonneDAOJDBC");
+		}
+	}
+	
 	public static void main (String[] args){
 		Connection conn = null;
 		Collection<Personne> maListe = null;

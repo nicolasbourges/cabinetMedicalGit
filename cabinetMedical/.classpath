@@ -8,6 +8,7 @@
 	</classpathentry>
 	<classpathentry including="**/*.java" kind="src" path="conf"/>
 	<classpathentry including="**/*.java" kind="src" path="log"/>
+	<classpathentry kind="src" path="Test"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.17.jar"/>
 	<classpathentry kind="lib" path="C:/Users/BN87/Documents/IUT/Année 2/Java/mysql-connector-java-5.1.27/mysql-connector-java-5.1.27-bin.jar"/>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">

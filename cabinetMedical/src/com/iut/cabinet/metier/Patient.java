@@ -90,6 +90,16 @@ public class Patient extends Personne {
 		return nir;
 	}
 	/**
+	 * @param nom
+	 * @param prenom
+	 * @param nir
+	 */
+	public Patient(String nom, String prenom, String nir) {
+		super(nom, prenom);
+		this.nir = nir;
+	}
+
+	/**
 	 * Modifie le NIR du patient
 	 * @param nir le nouveau NIR
 	 * @throws CabinetMedicalException 
