@@ -1,13 +1,20 @@
 package com.iut.cabinet.application;
 
 
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
 
 import com.iut.cabinet.metier.Adresse;
 import com.iut.cabinet.metier.CabinetMedicalException;
@@ -17,19 +24,94 @@ import com.iut.cabinet.metier.PatientRegle;
 import com.iut.cabinet.metier.Personne;
 import com.iut.cabinet.metier.PersonneDAOFichier;
 import com.iut.cabinet.metier.PersonneDAOJDBC;
+import com.iut.cabinet.user.AdresseDTO;
 import com.iut.cabinet.user.PatientDTO;
 import com.iut.cabinet.util.DateUtil;
 import com.iut.cabinet.util.SimpleConnection;
-
 
 /**
  * Classe correspondant au contrôleur dans le MVC du cabinet médical
  * @author Nicolas BOURGES
  * @version 1.1
  */
-public class GererPatientCtrl {
+@SuppressWarnings("deprecation")
+public class GererPatientCtrl{
 	private static Logger logger = Logger.getLogger(GererPatientCtrl.class.getName());
+	private PatientDTO givPatientDTO;
+	private PatientDTO givPatientDTO2;
+	private GererPatientCtrl GererPatientCtrlTest;
+	private Throwable throwable = null;
+	
+	//////////////////////////////////////////////////////////////////////
+	//
+	//Méthodes relatives aux tests d'acceptances JBehave
+	//
+	//////////////////////////////////////////////////////////////////////
+	@Given("un controleur")
+	public void givenUnControleur() {
+		 GererPatientCtrlTest = new GererPatientCtrl();	
+	}
+	@When("je cree un patient avec le NIR $nir et qu'il est valide")
+	public void whenLesInformationsSontValide(String nir) {
+		givPatientDTO= new PatientDTO(352,"LETEST", "Martin",
+				DateUtil.toDate("1994-04-11"), true, "0555213245",
+				"0655213245", "martin.letest@hotmail.fr", 
+				new AdresseDTO("Beta", "87065", "12","France" ,"avenueTest", "Limoges","" ),
+				null, nir, "Alpha Testeur");
+		try {
+			GererPatientCtrlTest.creerPatient(givPatientDTO);
+		} catch (ClassNotFoundException | CabinetMedicalException
+				| HelperException | CabinetTechniqueException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	@Then("le patient avec le NIR $nir est bien cree")
+	public void thenLePatientDoitEtreCreer(String nir) {
+		givPatientDTO= new PatientDTO(352,"LETEST", "Martin",
+				DateUtil.toDate("1994-04-11"), true, "0555213245",
+				"0655213245", "martin.letest@hotmail.fr", 
+				new AdresseDTO("Beta", "87065", "12","France" ,"avenueTest", "Limoges","" ),
+				null, nir, "Alpha Testeur");
+		try {
+			Assert.assertTrue(GererPatientCtrlTest.creerPatient(givPatientDTO));
+		} catch (ClassNotFoundException | CabinetMedicalException
+				| HelperException | CabinetTechniqueException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		}
+	
+	////////////////////////////////////////////////////////////////////////
+	
+	@When("je cree un patient avec le NIR $nir et des informations invalides")
+	public void whenLesInformationsNeSontPasValide(String nir) {
+		givPatientDTO2= new PatientDTO(698,"LETESTFAILER", "Martin",
+				DateUtil.toDate("1994-04-11"), true, "0555213245",
+				"0655213245", "martin.letest@hotmail.fr", 
+				new AdresseDTO("Beta", "87065", "12","France" ,"avenueTest", "Limoges","" ),
+				null, nir, "Alpha Testeur");
+		try {
+			GererPatientCtrlTest.creerPatient(givPatientDTO2);
+		} catch (ClassNotFoundException | CabinetMedicalException
+				| HelperException | CabinetTechniqueException | SQLException e) {
+			throwable=e;
+		}
+	}
 
+	@Then("le patient avec le NIR $nir n'est pas cree")
+	public void thenLePatientNeDoitPasEtreCreer(String nir) {
+		
+			assertThat(throwable.getClass().getName(),equalTo("com.iut.cabinet.metier.CabinetMedicalException"));	
+	}
+
+	
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	
+	
 	/**
 	 * Méthode pour créer un PatientDTO puis le stocker dans la BD mySQL
 	 * @param unPatientDTO le PatientDTO à créer puis stocker
@@ -39,10 +121,11 @@ public class GererPatientCtrl {
 	 * @throws CabinetTechniqueException
 	 * @throws SQLException 
 	 */
-	public void creerPatient(PatientDTO unPatientDTO) throws CabinetMedicalException, HelperException, ClassNotFoundException, CabinetTechniqueException, SQLException{
+	public Boolean creerPatient(PatientDTO unPatientDTO) throws CabinetMedicalException, HelperException, ClassNotFoundException, CabinetTechniqueException, SQLException{
 		if(logger.isDebugEnabled()){
 			logger.debug("Entrée dans la méthode creerPatient de GererPatientCtrl");
 		}
+		Boolean insertionComplete = true;
 		Connection conn = null;
 		conn = SimpleConnection.getInstance().getconnection();
 		Patient unPat;
@@ -55,6 +138,7 @@ public class GererPatientCtrl {
 			conn.setAutoCommit(false);	//sinon le commit de l'ennoncé du TP ne servirait à rien
 			conn.commit();
 		} catch(SQLException e){
+			insertionComplete = false;
 			e.printStackTrace();
 			throw new CabinetTechniqueException("Problème lors de la validation de la trasnsaction"+e.getMessage());
 		}
@@ -64,12 +148,14 @@ public class GererPatientCtrl {
 				conn.close();
 			}
 		} catch(SQLException e){
+			insertionComplete = false;
 			e.printStackTrace();
 			throw new CabinetTechniqueException("Problème lors de la fermeture de la connexion"+e.getMessage());
 		}
 		if(logger.isDebugEnabled()){
 			logger.debug("Sortie de la méthode creerPatient de GererPatientCtrl");
 		}
+		return insertionComplete;
 	}
 
 	/**
@@ -133,7 +219,6 @@ public class GererPatientCtrl {
 		}
 		Connection conn = null;
 		conn = SimpleConnection.getInstance().getconnection();
-		conn.setAutoCommit(false);
 		Collection <Personne> maListe = PersonneDAOJDBC.findAllPersonnes(conn);
 		for (Personne unPatientDTO: maListe){
 			if(unPatientDTO instanceof Patient && unPatientDTO.getNom().equals(nom) && unPatientDTO.getPrenom().equals(prenom) &&((Patient) unPatientDTO).getNir().equals(nir)){
@@ -143,6 +228,7 @@ public class GererPatientCtrl {
 				return unPatientDTO;
 			}
 		}
+		conn.setAutoCommit(false);
 		conn.commit();	//penser au rolllback au cas où
 		conn.close();
 		if(logger.isDebugEnabled()){
